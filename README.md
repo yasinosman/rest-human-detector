@@ -1,12 +1,12 @@
 # Installation
 
 ```bash
-pip3 install opencv-python
+pip3 install -r requirements.txt
 ```
 
 # Usage
 
 ```bash
-python3 src/main.py
+flask --app src/app.py run --debug --port 8000
 ```
 
