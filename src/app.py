@@ -1,45 +1,25 @@
 from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
 from api_error import APIError
-from os.path import join, dirname
 from detect_human import detect_human
+from base64_to_file import base64_to_file 
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = join(dirname(__file__), 'uploads/')
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/api/v1/", methods=["POST"])
 def detect():
-    if 'image' not in request.files:
-        raise APIError("No image provided", status_code=400)
+    print(request)
     
-    file = request.files['image']
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
-    if file.filename == '':
-        raise APIError("No image provided", status_code=400)
-    file = request.files["image"]
+    # convert base64 to image
+    base64_string = request.json['image']
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = base64_to_file(base64_string)
 
-        file.save(filepath)
+    human_count = detect_human(filepath)
 
-        print(filepath)
-
-        human_count = detect_human(filepath)
-
-        return {"human_count": human_count}
+    return {"human_count": human_count}
 
     
 @app.errorhandler(APIError)
 def invalid_api_usage(e):
     return jsonify(e.to_dict()), e.status_code
-    
     
