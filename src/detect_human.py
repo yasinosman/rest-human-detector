@@ -26,7 +26,7 @@ def detect_human(image_path, should_display=False):
 
     # display the output image
     cv2.imshow("Image", image)
-    cv2.waitKey(3000)
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
 
     return len(humans)
